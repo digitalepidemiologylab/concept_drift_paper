@@ -1,0 +1,3 @@
+[submodule "text_classification"]
+	path = text_classification
+	url = git@github.com:crowdbreaks/text-classification.git
