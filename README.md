@@ -34,9 +34,14 @@ Annotations after consensus
 All data to reproduce the figures are named as `fig_{n}_{description}.csv` and can also be found in the `data` folder.
 
 # Code
+
+## Experiments
 There are two scripts which include most relevant code to reproduce the anlaysis:
 * `run_fig2_experiments.py`: Runs the drift experiments for FastText
 * `run_fig3_experiments.py`: Runs code to compute properties in Figure 3.
+
+## Figures
+Code to generate the figures is provided in files with names `fig_{n}.py`, they will generate the figure files (in png and pdf) in a new folder `./plots/fig_{n}/` in the project root directory.
 
 If you have any more specific requests, please contact the corresponding author.
 
