@@ -45,3 +45,8 @@ Code to generate the figures is provided in files with names `fig_{n}.py`, they 
 
 If you have any more specific requests, please contact the corresponding author.
 
+
+# Tweet IDs
+All tweet IDs which were used for the study are available on Zenodo:
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4295829.svg)](https://doi.org/10.5281/zenodo.4295829)
