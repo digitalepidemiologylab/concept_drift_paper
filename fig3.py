@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import sys
-from utils.helpers import save_fig, paper_plot, cached
+from utils.helpers import save_fig, paper_plot, cached, add_colorbar
 import matplotlib.pyplot as plt
 import seaborn as sns
 import logging
@@ -74,35 +74,55 @@ def plot_fig3abc():
 
 @paper_plot
 def plot_fig3d(cached=True):
-    df = pd.read_csv(os.path.join(DATA_DIR, 'fig3_similarity_scores.csv'), index_col=0)
-    # plot similarity
-    fig, ax = plt.subplots(1, 1, figsize=(2, 2))
-    # normalize
-    min_val = df.values[np.triu_indices_from(df,k=1)].min()
-    max_val = df.values[np.triu_indices_from(df,k=1)].max()
-    df = (df - min_val) / (max_val - min_val)
-    mask = np.zeros(df.shape, dtype=bool)
-    mask[np.tril_indices(len(df), k=-1)] = True
-    cmap = 'Blues_r'
-    sns.heatmap(data=df, mask=mask, cmap=cmap, cbar_kws=dict(label='Normalized\ncosine similarity', fraction=.025, pad=.08), vmax=1, center=.5, lw=.2, ec='white', ax=ax, square=True)
+    sim_matrix = {}
+    keys = ['all', 'positive', 'neutral', 'negative']
+    for k in keys:
+        sim_matrix[k] = pd.read_csv(os.path.join(DATA_DIR, f'fig3d_{k}.csv'), index_col=0)
+    num_plots = len(sim_matrix.keys())
+    fig, _axes = plt.subplots(2, 2, figsize=(4, 4), sharex=True, sharey=True)
+    axes = []
+    for ax_row in _axes:
+        for ax in ax_row:
+            axes.append(ax)
 
-    # move axis labels
-    ax.tick_params(axis='both', direction='out')
+    min_vals = []
+    max_vals = []
+    for key, df in sim_matrix.items():
+        min_vals.append(df.values[np.triu_indices_from(df,k=1)].min())
+        max_vals.append(df.values[np.triu_indices_from(df,k=1)].max())
+    min_val = min(min_vals)
+    max_val = max(max_vals)
 
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=75, ha='right')
-    offset = matplotlib.transforms.ScaledTranslation(.05, 0, fig.dpi_scale_trans)
-    for label in ax.xaxis.get_majorticklabels():
-        label.set_transform(label.get_transform() + offset)
+    for key, ax in zip(keys, axes):
+        df = sim_matrix[key]
+        # normalize
+        df = (df - min_val) / (max_val - min_val)
+        mask = np.zeros(df.shape, dtype=bool)
+        mask[np.tril_indices(len(df), k=-1)] = True
+        cmap = 'Blues_r'
+        sns.heatmap(data=df, mask=mask, cmap=cmap, cbar=False, cbar_kws=dict(label='Normalized\ncosine similarity', fraction=.025, pad=.08), vmax=1, center=.5, lw=.2, ec='white', ax=ax, square=True)
 
-    ax.set_title('Corpus similarity', fontsize=7)
+        # move axis labels
+        ax.tick_params(axis='both', direction='out')
 
-    # some colorbar cosmetics
-    cbar = ax.collections[0].colorbar
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=75, ha='right')
+        offset = matplotlib.transforms.ScaledTranslation(.05, 0, fig.dpi_scale_trans)
+        for label in ax.xaxis.get_majorticklabels():
+            label.set_transform(label.get_transform() + offset)
+
+        # title
+        ax.set_title(key, fontsize=7)
+
+    # add colorbar
+    cbar = add_colorbar(fig, ax, x=.9, y=.42, length=.013, width=.2, vmin=0, vmax=1,
+            label='Normalized\ncosine similarity', cmap=cmap, orientation='vertical')
     cbar.ax.tick_params(axis='y', direction='out')
-    cbar.ax.yaxis.label.set_rotation(90)
     cbar.ax.yaxis.label.set_ha('center')
     cbar.ax.yaxis.label.set_va('top')
     cbar.ax.yaxis.set_major_locator(matplotlib.ticker.MaxNLocator(5))
+
+    fig.subplots_adjust(hspace=.2, wspace=0)
+    fig.suptitle('Corpus similarity', fontsize=7, y=.96)
 
     # save
     save_fig(fig, 'fig3d', version=1, plot_formats=['png', 'pdf'], dpi=800)
