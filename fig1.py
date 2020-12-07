@@ -94,10 +94,10 @@ def main():
 
     # annotations
     ts = ax.transAxes
-    coords = ts.transform([0, .5])
+    coords = ts.transform([-0.092, -0.065])
     tr = mpl.transforms.Affine2D().rotate_deg_around(*coords, 90)
     t = ts + tr
-    brace = curly_brace(x=.18, y=-.85, width=.03, height=.54, lw=.5, pointing='right', transform=t, color='.15')
+    brace = curly_brace(x=.1, y=.1, width=.03, height=.54, lw=.5, pointing='right', transform=t, color='.15')
     ax.add_artist(brace)
     ax.text(.25, .85, 'training window\nfor $b_1$', ha='center', va='bottom', transform=ts, fontsize=7)
 
@@ -109,6 +109,7 @@ def main():
 
     # save
     save_fig(fig, 'fig1', version=1, plot_formats=['png', 'pdf'])
+
 
 if __name__ == "__main__":
     main()
